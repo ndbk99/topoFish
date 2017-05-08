@@ -2,13 +2,7 @@
 # = Load Packages =
 # =================
 
-library(trawlData)
-library(trawlDiversity)
-library(spatialDiversity)
-library(maps)
-library(sp)
-library(spatstat)
-library(animation)
+library(topoFish)
 
 
 # =============
@@ -19,9 +13,11 @@ lo[1,1] <- 2
 
 
 uspp <- ebs_sppMaster[ce_categ=="both", unique(spp)]
+# setwd("~/Documents/School&Work/pinskyPost/topoFish")
 old.wd <- getwd()
-setwd("~/Desktop")
-for(us in 1:length(uspp)){
+setwd("../notPkg/figures")
+# for(us in 1:length(uspp)){
+for(us in 1:1){
 	tspp <- uspp[us]
 	treg <- 'ebs' # eastern bering sea
 	t_name <- paste0(treg, "_", gsub(" ", "_", tspp), ".gif") # file name
