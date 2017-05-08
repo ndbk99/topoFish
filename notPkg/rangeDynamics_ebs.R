@@ -13,7 +13,7 @@ lo[1,1] <- 2
 
 
 uspp <- ebs_sppMaster[ce_categ=="both", unique(spp)]
-# setwd("~/Documents/School&Work/pinskyPost/topoFish")
+# setwd("~/Documents/School&Work/pinskyPost/topoFish/notPkg")
 old.wd <- getwd()
 setwd("../notPkg/figures")
 # for(us in 1:length(uspp)){
@@ -29,7 +29,7 @@ for(us in 1:1){
 	bg_dat <- yr_dat[!is.na(btemp)][!duplicated(paste(lon,lat))] # background data; unique lon-lat combinations, with bottom temperature
 	animation::saveGIF(
 		{
-			ani.options(inverval=0.0001)
+			animation::ani.options(inverval=0.0001)
 			for(ty in 1:length(uy)){
 				tyr <- uy[ty]
 				tdat <- spp_dat[year==tyr] # data just for current year
@@ -49,7 +49,7 @@ for(us in 1:1){
 					clusts <- hclust(dists, method='single') # do hierarchical clustering
 					groups <- cutree(clusts, h=100) # h is the cutoff height from the dendrogram
 					tdat[,clustGroup:=groups]
-					tdat[,clustColor:=viridis(max(groups))[groups]]
+					tdat[,clustColor:=viridis::viridis(max(groups))[groups]]
 					
 					tdat[, j={
 						ch <- chull(x=lon, y=lat)
@@ -73,6 +73,7 @@ for(us in 1:1){
 			}
 	
 		},
+		autobrowse=FALSE,
 		ani.height=400,
 		ani.width=400,
 		movie.name=t_name,
