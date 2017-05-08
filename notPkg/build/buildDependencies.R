@@ -6,6 +6,7 @@ update_dependencies <- function(){
 	devtools::use_package("stats", type="Imports")
 	devtools::use_package("methods", type="Imports")
 	
+	devtools::use_package("animation", type="Suggests")
 	devtools::use_package("geosphere", type="Suggests")
 	devtools::use_package("trawlData", type="Suggests") # on rbatt github
 	devtools::use_package("raster", type="Suggests")

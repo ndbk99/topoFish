@@ -23,5 +23,6 @@ Suggests:
     maps,
     viridis,
     spatstat,
-    geosphere
+    geosphere,
+    animation
 RoxygenNote: 5.0.1
