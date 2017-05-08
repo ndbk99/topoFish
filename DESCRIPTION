@@ -1,0 +1,27 @@
+Package: topoFish
+Title: Spatial Topology of Marine Fishes
+Version: 0.0.0.9000
+Authors@R: c(person(given="Ryan D.", family="Batt", email="battrd@gmail.com", role=c("aut","cre")),
+	person(given="Rachel", family="Levanger", email="", role=c("aut")),
+	person(given="Pat", family="Devlin", email="", role=c("aut")),
+	person(given="Malin L.", family="Pinsky", email="malin.pinsky@rutgers.edu", role=c("aut")))
+Description: Analyzes time series of geographic distributions using graph
+    theory.
+Depends:
+    R (>= 3.3.0),
+    data.table
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Imports:
+    rbLib,
+    stats,
+    methods
+Suggests:
+    trawlData,
+    raster,
+    maps,
+    viridis,
+    spatstat,
+    geosphere
+RoxygenNote: 5.0.1
