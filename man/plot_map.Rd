@@ -4,7 +4,7 @@
 \alias{plot_map}
 \title{plot map}
 \usage{
-plot_map(x, y, marks, map_owin)
+plot_map(x, y, marks, map_owin, zlim = NULL)
 }
 \arguments{
 \item{x}{x coordinate}
@@ -12,6 +12,8 @@ plot_map(x, y, marks, map_owin)
 \item{y}{y coordinate}
 
 \item{marks}{value to be plotted}
+
+\item{zlim}{limits for the z (color) axis; useful for standardizing color scale across plots.}
 
 \item{owin}{object for outline}
 }
