@@ -1,6 +1,7 @@
 import csv
 import math
 from graphics import *
+import matplotlib.pyplot as plt
 
 # class - observation datum
 class observation(object):
@@ -34,21 +35,7 @@ def data_subset(data,species,year):
 
 	return result
 
-# function - plot observation point on window
-def plot(window,info=False):
-
-	p = Point(x.longitude,abs(x.latitude))
-	c = Circle(p,5)
-	if info:
-		print(x.index,x.longitude,x.latitude)
-	c.setOutline("black")
-	c.draw(window)
-
-	return c
-
-
 ################################################################################
-
 
 # open and read data from file
 data = []
@@ -69,58 +56,22 @@ max_lat = max([x.latitude for x in subset])
 min_long = min([x.longitude for x in subset])
 max_long = max([x.longitude for x in subset])
 
-# calculate and scale window dimensions, allow for border padding
-width = abs(max_long - min_long)*100 + 10
-height = abs(max_lat - min_lat)*100 + 10
-print(width, height)
+plt.ion()  # set plotting mode to interactice
+plt.show()
 
-# adjust coordinates
-for x in subset:
-	# normalize with minima
-	x.latitude -= min_lat
-	x.longitude -= min_long
-	# scale
-	x.latitude *= 100
-	x.longitude *= 100
-	# allow for border padding
-	x.latitude += 5
-	x.longitude += 5
-	# flip right side up
-	x.latitude = height - x.latitude
-
-# create graph window
-win = GraphWin("topoFish",width,height)
-
-# plot points for each year for this species
+# animate data from year to year
+i = 1
 for year in range(1984,2015):
 
-	scatter = []  # array to hold graphics objects plotted
+	year_subset = data_subset(data,species,year)
+	print(year)
 
+	fig = plt.figure(i)
+	plt.scatter([x.longitude for x in year_subset], [x.latitude for x in year_subset])
+	plt.axis([min_long - 1, max_long + 1, min_lat - 1, max_lat + 1])
 
-	# plot this round of points
-	year_subset = data_subset(subset,'none',year)
-	for x in year_subset:
-		scatter.append(plot(win,x))
+	plt.draw()
+	plt.pause(0.1)
+	plt.clf()
 
-	# time delay
-	for x in range(5000):
-		Point(-10,-10).draw(win)
-
-	# undraw this round of points
-	for x in scatter:
-		x.undraw()
-
-
-# sketchy thing that keeps window open til you close it, and doesn't throw error on close
-while win.isOpen():
-	Point(-10,-10).draw(win)
-
-
-################################################################################
-
-
-# Okay I really need to get some better plotting library. Probably matplotlib is the way to go tbh and then I could not do all the scaling shite. Next step!
-# 1) transition to matplotlib
-# 2) create animations
-# 3) implement best cluster-id method
-# 4) start thinking about cluster-tracking problem
+# https://stackoverflow.com/questions/28269157/plotting-in-a-non-blocking-way-with-matplotlib
