@@ -1,0 +1,38 @@
+species: aforia circinata
+1984,n=11,1.1 - 1.2 / neither of these actually works - look inside range
+1985,n=10,1 - 1.1
+1986,n=3,0.8 - 1.5 / data sparse
+1987,n=9,0.8 - 1.1
+1988,n=17,1.1 - 1.2 / neither of these actually works - look inside range
+1989,n=7,0.8 - 1.1
+1990,n=1,n/a / one data point
+1991,n=0,n/a / one data point
+1992,n=0,n/a / one data point
+1993,n=7,maybe 0.9,probs 1 - 1.4
+1994,n=4,0.2-1.1
+1995,n=4,0.7 - 0.8 / neither of these actually works - look inside range
+1996,n=6,0.8-1.1
+1997,n=4,maybe 0.2 - 1.1,maybe 1.2-1.4 / data in questionable pairs
+1998,n=5,0.8-1.1
+1999,n=2,none correct if there are actually 2 clusters / data sparse
+2000,n=3,0.2 - 0.7 / data sparse
+2001,n=4,maybe 0.2 - 1.1,maybe 1.2-1.4 / data in questionable pairs
+2002,n=4,maybe 0.2 - 1.1,maybe 1.2-1.4 / data in questionable pairs
+2003,n=13,1.1-1.2 / neither of these actually works - look inside range
+2004,n=5,0.8-1.1
+2005,n=7,0.8-1.1
+2006,n=9,1.1-1.2 / neither '""" - look inside range / data kind of unclear
+2007,n=13,1.1-1.2 / neither '""" - look inside range / data kind of unclear
+2008,n=10,1.1-1.2 / neither '""" - look inside range / data kind of unclear
+2009,n=11,0.9-1.1
+2010,n=18,1.1-1.2 / neither '""" - look inside range
+2011,n=16,1.1-1.2 / neither '""" - look inside range / data kind of unclear
+2012,n=8,1.1
+2013,n=17,1.1-1.2 / neither '""" - look inside range
+2014,n=9,0.8-1.1
+
+trends:
+n > 7ish wants 1.1-1.2
+n <= 7 ish wants 0.8-1.1
+sparse data makes algo fuck up
+has trouble with some larger data sets that aren't distinctly clustered

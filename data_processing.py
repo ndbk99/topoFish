@@ -4,7 +4,7 @@ from graphics import *
 import matplotlib.pyplot as plt
 from scipy.cluster import hierarchy
 
-# class - observation datum
+# observation datum
 class observation(object):
 
 	def __init__(self, index, species, longitude, latitude, year):
@@ -17,7 +17,7 @@ class observation(object):
 	def toString(self):
 		print(self.index, self.species, self.latitude, self.longitude)
 
-# function - create subset of observations that are of given species in given year
+# create subset of observations that are of given species in given year
 def data_subset(data,species,year):
 
 	result = []
@@ -37,14 +37,41 @@ def data_subset(data,species,year):
 
 	return result
 
-# function to plot one data set (all observations of one species in one year)
-def plot_set(data,species,year):
+# plot one data set (all observations of one species in one year)
+def plot_set(d):
 	data_set = data_subset(data,species,year)
 	plt.scatter([x.longitude for x in data_set], [x.latitude for x in data_set])
 	plt.axis([min_long - 1, max_long + 1, min_lat - 1, max_lat + 1])
 	plt.show()
 
-# =creates animation of observations of a certain species over the years
+# plot data set colored by cluster
+def plot_clusters(d,clustering):
+
+	# can't perform clustering on 0 or 1 points so exit function
+	if len(d) < 2:
+		plt.show()
+		return 0
+
+	plt.axis([min_long - 1, max_long + 1, min_lat - 1, max_lat + 1])
+
+	for i in range(len(d)):
+
+		cluster = clustering[i]
+
+		if cluster % 4 == 0:
+			c = "red"
+		elif cluster % 4 == 1:
+			c = "blue"
+		elif cluster % 4 == 2:
+			c = "green"
+		elif cluster % 4 == 3:
+			c = "black"
+
+		plt.scatter(d[i].longitude, d[i].latitude, color=c)
+
+	plt.show()
+
+# create animation of observations of a certain species over the years
 def animate(data):
 
 	plt.ion()  # set plotting mode to interactive or whatever
@@ -68,10 +95,8 @@ def animate(data):
 		plt.clf()
 
 # find the cluster distribution for a data set
-def clusters(data,species,year,param=1):
-	radius = 100
-	points = [[x.longitude, x.latitude] for x in data_subset(data,species,year)]
-	print(len(points))
+def clusters(d,param=1):
+	points = [[x.longitude, x.latitude] for x in d]
 	if len(points) > 1:
 		clusters = hierarchy.fclusterdata(points,param)
 		return clusters
@@ -88,15 +113,19 @@ def frange(start, stop, step):
 		result.append(i)
 	return result
 
+# open and read data from file
+def read_data(f):
+	data = []
+	with open(f, "r") as csvfile:
+		r = csv.reader(csvfile, delimiter=",")
+		for row in r:
+			x = observation(row[0], row[2], row[7], row[8], row[12])
+			data.append(x)
+	return data
+
 ###############################################################################
 
-# open and read data from file
-data = []
-with open("mydata.csv", "r") as csvfile:
-	r = csv.reader(csvfile, delimiter=",")
-	for row in r:
-		x = observation(row[0], row[2], row[7], row[8], row[12])
-		data.append(x)
+data = read_data("mydata.csv")
 
 # create subset of data
 species = 'Aforia circinata'
@@ -116,12 +145,22 @@ for i in frange(0.1,2,0.01):
 plot_set(data,species,1985)
 """
 
-# test the parameter value over the data over the years
-param = 1
+# test different parameter values over the different years
+"""
 for year in range(1984,2015):
-	print(clusters(data,species,year,param))
-	plot_set(data,species,year)
+	print("-----------------------")
+	print("-----------------------")
+	print("YEAR:", year)
+	for i in frange(0.2,1.5,0.1):
+		print(i, clusters(data,species,year,i))
+	plot_set(data_subset(data,species,year))
+"""
+
+# visualize clustering for parameter=1.0
+for year in range(1984,2015):
+	plot_clusters(data_subset(data,species,year),clusters(data_subset(data,species,year),1.0))
 
 # https://github.com/mstrosaker/hclust/wiki/User's-guide
 # https://stackoverflow.com/questions/28269157/plotting-in-a-non-blocking-way-with-matplotlib
 # https://docs.scipy.org/doc/scipy-0.19.1/reference/generated/scipy.spatial.distance_matrix.html
+# https://docs.scipy.org/doc/scipy/reference/generated/scipy.cluster.hierarchy.fclusterdata.html#scipy.cluster.hierarchy.fclusterdata
