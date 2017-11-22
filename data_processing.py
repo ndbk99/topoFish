@@ -1,12 +1,12 @@
 import csv
 import math
-from graphics import *
 import matplotlib.pyplot as plt
 from scipy.cluster import hierarchy
+import time as t
 
 """
 class to hold observation datum
-parameters: index, species, longitude, latitude, time
+parameters: index, species, longitude, latitude, timestamp
 """
 class observation(object):
 
@@ -15,7 +15,8 @@ class observation(object):
 		self.species = species
 		self.longitude = float(longitude)
 		self.latitude = float(latitude)
-		self.time = int(time)
+		cut = len(time) # - 6  # cut time of day out of timestamp string
+		self.time = (t.strptime(time[0:cut], "%m/%d/%Y %H:%M")) # convert time into time.struct_time object
 
 	def toString(self):
 		print(self.index, self.species, self.latitude, self.longitude)
@@ -28,17 +29,13 @@ def data_subset(data,species,time):
 
 	result = []
 
-	if species == "none":
-		for x in data:
-			if x.time == time:
-				result.append(x)
-	elif time == "none":
+	if time == "none":
 		for x in data:
 			if x.species == species:
 				result.append(x)
 	else:
 		for x in data:
-			if x.species == species and x.time == time:
+			if x.species == species and timeToString(x.time) == time:
 				result.append(x)
 
 	return result
@@ -92,17 +89,17 @@ create animation of observations of a certain species over the times
 input: set of observations of 1 species over all times
 output: animated plot of the species over the times
 """
-def animate(data):
+def animate(data,times):
 
 	# plt.ion()  # set plotting mode to interactive or whatever
 	plt.show()
 
 	# animate data from time to time
 	i = 1
-	for time in range(1984,2015):
+	for time in times:
 
-		print(time)
-		time_subset = data_subset(data,species,time)
+		print(timeToString(time))
+		time_subset = data_subset(data,species,timeToString(time))
 
 		# plot current figure
 		fig = plt.figure(i)
@@ -111,7 +108,7 @@ def animate(data):
 
 		# draw and then clear current points
 		plt.draw()
-		plt.pause(0.05)
+		plt.pause(0.00005)
 		plt.clf()
 
 """
@@ -151,63 +148,47 @@ def read_data(f):
 	with open(f, "r") as csvfile:
 		r = csv.reader(csvfile, delimiter=",")
 		for row in r:
-			x = observation(row[0], row[2], row[7], row[8], row[12])
+			x = observation(row[0], row[2], row[7], row[8], row[10])
 			data.append(x)
 	return data
+
+"""
+create sorted list of days of observations of a given species
+input: set of observations of desired species
+output: list of days that observations of that species were made
+"""
+def species_times(data):
+	times = []
+	for x in data:
+		if x.species == species:
+			if x.time not in times:
+				times.append(x.time)
+	return sorted(times)
+
+"""
+convert time object to string
+input: time object to be converted
+output: string result
+"""
+def timeToString(time_object):
+	return (t.strftime("%m/%d/%Y %H:%M",time_object))
 
 ###############################################################################
 
 data = read_data("mydata.csv")
 
 # create subset of data
-species = 'Trichodon trichodon'#'Platichthys stellatus' # 'Paralithodes camtschaticus' #'Hippoglossus stenolepis' # 'Hippoglossoides elassodon' # 'Crangon dalli' # 'Ammodytes hexapterus' # 'Theragra chalcogramma' # 'Telmessus cheiragonus' # 'Tellina lutea' # 'Platichthys stellatus' # 'Oregonia gracilis' # 'Mallotus villosus' # 'Limanda proboscidea' # 'Limanda aspera' # 'Hyas lyratus' # 'Hippoglossus stenolepis' # 'Glyptocephalus zachirus' #'Gadus macrocephalus' #'Clupea pallasii pallasii' #'Aforia circinata'
+species = 'Clupea pallasii pallasii' # 'Asterias amurensis'
 time = 'none'
 subset = data_subset(data,species,time)
 
 # find max and min lats and longs of Asterias amurensis observations
-min_lat = min([x.latitude for x in subset])
-max_lat = max([x.latitude for x in subset])
-min_long = min([x.longitude for x in subset])
-max_long = max([x.longitude for x in subset])
+min_lat = min([x.latitude for x in data])
+max_lat = max([x.latitude for x in data])
+min_long = min([x.longitude for x in data])
+max_long = max([x.longitude for x in data])
 
-# try out different parameter values on the 1985 data set to see which works best
-"""
-for i in frange(0.1,2,0.01):
-	print(i, clusters(data,species,1985,i))
-plot_set(data,species,1985)
-"""
+# animate the observations over time - actually just looks like one (sometimes 2) points dancing around. may not even need to cluster! could just take centroids and connect them or something
+animate(subset, species_times(subset))
 
-# test different parameter values over the different years
-"""
-for year in range(1984,2015):
-	print("-----------------------")
-	print("-----------------------")
-	print("YEAR:", year)
-	for i in frange(0.2,1.5,0.1):
-		print(i, clusters(data,species,year,i))
-	plot_set(data_subset(data,species,year))
-"""
-
-# visualize clustering for parameter=1.0
-
-"""
-for year in range(1984,2015):
-	plot_clusters(data_subset(data,species,year),1.0)
-"""
-
-# animate each species
-species_list = []
-for x in data:
-	if x.species not in species_list:
-		print(x.species)
-		species_list.append(x.species)
-
-for species in species_list:
-	animate(data_subset(data,species,time))
-
-
-
-# https://github.com/mstrosaker/hclust/wiki/User's-guide
-# https://stackoverflow.com/questions/28269157/plotting-in-a-non-blocking-way-with-matplotlib
-# https://docs.scipy.org/doc/scipy-0.19.1/reference/generated/scipy.spatial.distance_matrix.html
-# https://docs.scipy.org/doc/scipy/reference/generated/scipy.cluster.hierarchy.fclusterdata.html#scipy.cluster.hierarchy.fclusterdata
+################################################################################
