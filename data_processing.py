@@ -4,57 +4,72 @@ from graphics import *
 import matplotlib.pyplot as plt
 from scipy.cluster import hierarchy
 
-# observation datum
+"""
+class to hold observation datum
+parameters: index, species, longitude, latitude, time
+"""
 class observation(object):
 
-	def __init__(self, index, species, longitude, latitude, year):
+	def __init__(self, index, species, longitude, latitude, time):
 		self.index = int(index)
 		self.species = species
 		self.longitude = float(longitude)
 		self.latitude = float(latitude)
-		self.year = int(year)
+		self.time = int(time)
 
 	def toString(self):
 		print(self.index, self.species, self.latitude, self.longitude)
 
-# create subset of observations that are of given species in given year
-def data_subset(data,species,year):
+"""
+create subset of observations that are of given species at given time
+input: data to take subset of, name of species, time
+"""
+def data_subset(data,species,time):
 
 	result = []
 
 	if species == "none":
 		for x in data:
-			if x.year == year:
+			if x.time == time:
 				result.append(x)
-	elif year == "none":
+	elif time == "none":
 		for x in data:
 			if x.species == species:
 				result.append(x)
 	else:
 		for x in data:
-			if x.species == species and x.year == year:
+			if x.species == species and x.time == time:
 				result.append(x)
 
 	return result
 
-# plot one data set (all observations of one species in one year)
-def plot_set(d):
-	data_set = data_subset(data,species,year)
-	plt.scatter([x.longitude for x in data_set], [x.latitude for x in data_set])
+"""
+plot one data set (all observations of one species at one time)
+input: set of observations of 1 species at 1 time
+output: plot of data points
+"""
+def plot_set(data):
+	plt.scatter([x.longitude for x in data], [x.latitude for x in data])
 	plt.axis([min_long - 1, max_long + 1, min_lat - 1, max_lat + 1])
 	plt.show()
 
-# plot data set colored by cluster
-def plot_clusters(d,clustering):
+"""
+plot clusters of data
+input: set of observations of 1 species at 1 time, clustering parameter (default = 1.0)
+output: plot of data points colored by cluster
+"""
+def plot_clusters(data,param=1.0):
 
 	# can't perform clustering on 0 or 1 points so exit function
-	if len(d) < 2:
+	if len(data) < 2:
 		plt.show()
 		return 0
 
+	clustering = clusters(data,param)
+
 	plt.axis([min_long - 1, max_long + 1, min_lat - 1, max_lat + 1])
 
-	for i in range(len(d)):
+	for i in range(len(data)):
 
 		cluster = clustering[i]
 
@@ -67,43 +82,56 @@ def plot_clusters(d,clustering):
 		elif cluster % 4 == 3:
 			c = "black"
 
-		plt.scatter(d[i].longitude, d[i].latitude, color=c)
+		plt.scatter(data[i].longitude, data[i].latitude, color=c)
 
 	plt.show()
+	plt.close()
 
-# create animation of observations of a certain species over the years
+"""
+create animation of observations of a certain species over the times
+input: set of observations of 1 species over all times
+output: animated plot of the species over the times
+"""
 def animate(data):
 
-	plt.ion()  # set plotting mode to interactive or whatever
+	# plt.ion()  # set plotting mode to interactive or whatever
 	plt.show()
 
-	# animate data from year to year
+	# animate data from time to time
 	i = 1
-	for year in range(1984,2015):
+	for time in range(1984,2015):
 
-		year_subset = data_subset(data,species,year)
-		print(year)
+		print(time)
+		time_subset = data_subset(data,species,time)
 
-		# plot and scale current figure
+		# plot current figure
 		fig = plt.figure(i)
-		plt.scatter([x.longitude for x in year_subset], [x.latitude for x in year_subset])
+		plt.scatter([x.longitude for x in time_subset], [x.latitude for x in time_subset])
 		plt.axis([min_long - 1, max_long + 1, min_lat - 1, max_lat + 1])
 
 		# draw and then clear current points
 		plt.draw()
-		plt.pause(0.1)
+		plt.pause(0.05)
 		plt.clf()
 
-# find the cluster distribution for a data set
-def clusters(d,param=1):
-	points = [[x.longitude, x.latitude] for x in d]
+"""
+find the cluster distribution for a data set
+input: set of observations of 1 species in 1 year, clustering parameter
+output: list of cluster indices for the observations
+"""
+def clusters(data,param=1):
+	points = [[x.longitude, x.latitude] for x in data]
 	if len(points) > 1:
 		clusters = hierarchy.fclusterdata(points,param)
 		return clusters
 	else:
 		return 0
 
-# modified range function to allow floats - used to test out different param values in fclusterdata
+"""
+modified range function to allow floats - used to test out different param values in fclusterdata
+input: floats to set start and stop values, step between values
+output: list of floats from start to stop, separated by step
+"""
 def frange(start, stop, step):
 	result = []
 	i = start
@@ -113,7 +141,11 @@ def frange(start, stop, step):
 		result.append(i)
 	return result
 
-# open and read data from file
+"""
+open and read data from file
+input: file name
+output: list of observation objects created from file dat
+"""
 def read_data(f):
 	data = []
 	with open(f, "r") as csvfile:
@@ -128,9 +160,9 @@ def read_data(f):
 data = read_data("mydata.csv")
 
 # create subset of data
-species = 'Aforia circinata'
-year = 'none'
-subset = data_subset(data,species,year)
+species = 'Trichodon trichodon'#'Platichthys stellatus' # 'Paralithodes camtschaticus' #'Hippoglossus stenolepis' # 'Hippoglossoides elassodon' # 'Crangon dalli' # 'Ammodytes hexapterus' # 'Theragra chalcogramma' # 'Telmessus cheiragonus' # 'Tellina lutea' # 'Platichthys stellatus' # 'Oregonia gracilis' # 'Mallotus villosus' # 'Limanda proboscidea' # 'Limanda aspera' # 'Hyas lyratus' # 'Hippoglossus stenolepis' # 'Glyptocephalus zachirus' #'Gadus macrocephalus' #'Clupea pallasii pallasii' #'Aforia circinata'
+time = 'none'
+subset = data_subset(data,species,time)
 
 # find max and min lats and longs of Asterias amurensis observations
 min_lat = min([x.latitude for x in subset])
@@ -157,8 +189,23 @@ for year in range(1984,2015):
 """
 
 # visualize clustering for parameter=1.0
+
+"""
 for year in range(1984,2015):
-	plot_clusters(data_subset(data,species,year),clusters(data_subset(data,species,year),1.0))
+	plot_clusters(data_subset(data,species,year),1.0)
+"""
+
+# animate each species
+species_list = []
+for x in data:
+	if x.species not in species_list:
+		print(x.species)
+		species_list.append(x.species)
+
+for species in species_list:
+	animate(data_subset(data,species,time))
+
+
 
 # https://github.com/mstrosaker/hclust/wiki/User's-guide
 # https://stackoverflow.com/questions/28269157/plotting-in-a-non-blocking-way-with-matplotlib
