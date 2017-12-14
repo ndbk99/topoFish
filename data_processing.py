@@ -24,8 +24,9 @@ class observation(object):
 """
 create subset of observations that are of given species at given time
 input: data to take subset of, name of species, time
+output: set of observations that match the input parameters
 """
-def data_subset(data,species,time):
+def data_subset(data,species,time="none"):
 
 	result = []
 
@@ -86,7 +87,7 @@ def plot_clusters(data,param=1.0):
 
 """
 create animation of observations of a certain species over the times
-input: set of observations of 1 species over all times
+input: set of observations of 1 species over all times, list of times (in time.struct_time object format) that observations of this species were made
 output: animated plot of the species over the times
 """
 def animate(data,times):
@@ -104,7 +105,7 @@ def animate(data,times):
 		# plot current figure
 		fig = plt.figure(i)
 		plt.scatter([x.longitude for x in time_subset], [x.latitude for x in time_subset])
-		plt.axis([min_long - 1, max_long + 1, min_lat - 1, max_lat + 1])
+		plt.axis([min([x.longitude for x in data]) - 1, max([x.longitude for x in data]) + 1, min([x.latitude for x in data]) - 1, max([x.latitude for x in data]) + 1])
 
 		# draw and then clear current points
 		plt.draw()
@@ -160,9 +161,8 @@ output: list of days that observations of that species were made
 def species_times(data):
 	times = []
 	for x in data:
-		if x.species == species:
-			if x.time not in times:
-				times.append(x.time)
+		if x.time not in times:
+			times.append(x.time)
 	return sorted(times)
 
 """
@@ -175,20 +175,12 @@ def timeToString(time_object):
 
 ###############################################################################
 
+# read observation objects from data file
 data = read_data("mydata.csv")
 
 # create subset of data
-species = 'Clupea pallasii pallasii' # 'Asterias amurensis'
-time = 'none'
-subset = data_subset(data,species,time)
-
-# find max and min lats and longs of Asterias amurensis observations
-min_lat = min([x.latitude for x in data])
-max_lat = max([x.latitude for x in data])
-min_long = min([x.longitude for x in data])
-max_long = max([x.longitude for x in data])
+species = 'Mactromeris polynyma'
+subset = data_subset(data,species)
 
 # animate the observations over time - actually just looks like one (sometimes 2) points dancing around. may not even need to cluster! could just take centroids and connect them or something
 animate(subset, species_times(subset))
-
-################################################################################
