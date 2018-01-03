@@ -15,8 +15,7 @@ class observation(object):
 		self.species = species
 		self.longitude = float(longitude)
 		self.latitude = float(latitude)
-		cut = len(time) # - 6  # cut time of day out of timestamp string
-		self.time = (t.strptime(time[0:cut], "%m/%d/%Y %H:%M")) # convert time into time.struct_time object
+		self.time = time
 
 	def toString(self):
 		print(self.index, self.species, self.latitude, self.longitude)
@@ -26,7 +25,7 @@ create subset of observations that are of given species at given time
 input: data to take subset of, name of species, time
 output: set of observations that match the input parameters
 """
-def data_subset(data,species,time="none"):
+def data_subset(data,species,time):
 
 	result = []
 
@@ -34,9 +33,13 @@ def data_subset(data,species,time="none"):
 		for x in data:
 			if x.species == species:
 				result.append(x)
+	elif species == "none":
+		for x in data:
+			if x.time == time:
+				result.append(x)
 	else:
 		for x in data:
-			if x.species == species and timeToString(x.time) == time:
+			if x.species == species and x.time == time:
 				result.append(x)
 
 	return result
@@ -86,21 +89,22 @@ def plot_clusters(data,param=1.0):
 	plt.close()
 
 """
-create animation of observations of a certain species over the times
-input: set of observations of 1 species over all times, list of times (in time.struct_time object format) that observations of this species were made
-output: animated plot of the species over the times
+create animation of observations of a certain species over the years
+input: set of observations of 1 species over all years
+output: animated plot of the species over the years
 """
-def animate(data,times):
+def animate(data, species):
 
 	# plt.ion()  # set plotting mode to interactive or whatever
 	plt.show()
 
+	print(species)
+
 	# animate data from time to time
 	i = 1
-	for time in times:
+	for time in range(1984,2015):
 
-		print(timeToString(time))
-		time_subset = data_subset(data,species,timeToString(time))
+		time_subset = data_subset(data,species,time)
 
 		# plot current figure
 		fig = plt.figure(i)
@@ -111,6 +115,8 @@ def animate(data,times):
 		plt.draw()
 		plt.pause(0.00005)
 		plt.clf()
+
+	plt.close()
 
 """
 find the cluster distribution for a data set
@@ -149,38 +155,18 @@ def read_data(f):
 	with open(f, "r") as csvfile:
 		r = csv.reader(csvfile, delimiter=",")
 		for row in r:
-			x = observation(row[0], row[2], row[7], row[8], row[10])
+			x = observation(row[0], row[2], row[7], row[8], int(row[12]))
 			data.append(x)
 	return data
 
-"""
-create sorted list of days of observations of a given species
-input: set of observations of desired species
-output: list of days that observations of that species were made
-"""
-def species_times(data):
-	times = []
-	for x in data:
-		if x.time not in times:
-			times.append(x.time)
-	return sorted(times)
-
-"""
-convert time object to string
-input: time object to be converted
-output: string result
-"""
-def timeToString(time_object):
-	return (t.strftime("%m/%d/%Y %H:%M",time_object))
 
 ###############################################################################
 
 # read observation objects from data file
 data = read_data("mydata.csv")
 
-# create subset of data
-species = 'Mactromeris polynyma'
-subset = data_subset(data,species)
+clustered_species = ['Aforia circinata','Argis dentata', 'Argis lar', 'Artediellus pacificus', 'Buccinum polare', 'Ciliatocardium ciliatum', 'Crangon dalli', 'Cyanea capillata', 'Echinarachnius parma', 'Elegius gracilis', 'Eunoe depressa', 'Euspira pallida', 'Gersemia rubiformis', 'Glebocarcinus oregonensis', 'Grandicrepidula grandis', 'Halichondria panicea', 'Halocynthia aurantium', 'Hiatella arctica', 'Icelus spatula', 'Icelus spiniger', \
+'Leptasterias groenlandica', 'Limanda sakhalinensis', 'Liparis gibbus', 'Lycodes raridens', 'Mactromeris polynyma', 'Matridium farcimen', 'Musculus discors', 'Neocrangon communis', 'Ophiura sarsii', 'Pyrulofusus melonis', 'Rhamphostomella costata', 'Serratiflustra serrulata', 'Siliqua alta', 'Stomphia coccinea', 'Tellina lutea', 'Trichodon trichodon', 'Triglops pingelii', 'Triglops scepticus', 'Tritonia diomedea', 'Urticina crassicornis', 'Volutopsius fragilis', 'Volutopsius middendorffii']
 
-# animate the observations over time - actually just looks like one (sometimes 2) points dancing around. may not even need to cluster! could just take centroids and connect them or something
-animate(subset, species_times(subset))
+for sp in clustered_species:
+	animate(data,sp)
