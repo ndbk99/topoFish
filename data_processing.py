@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from scipy import cluster
 import time as t
 from math import radians, cos, sin, asin, sqrt
+from scipy.misc import imread
 
 """
 open and read data from file
@@ -123,8 +124,8 @@ def clusters(data):
 	if len(data) > 1:
 		clusters = cluster.hierarchy.single(matrix)
 		cut = cluster.hierarchy.cut_tree(clusters, n_clusters=None, height=100)
-		return cut
-		# NOT WORKING :((( idk why ?????
+		result = [x[0] for x in cut]
+		return result
 	else:
 		return 0
 
@@ -143,7 +144,7 @@ def plot_set(data):
 
 """
 plot clusters of data
-input: set of observations of 1 species at 1 time, clustering parameter (default = 1.0)
+input: set of observations of 1 species at 1 time
 output: plot of data points colored by cluster
 """
 def plot_clusters(data):
@@ -171,7 +172,11 @@ def plot_clusters(data):
 		elif cluster % 4 == 3:
 			c = "black"
 
-		plt.scatter(data[i].longitude, data[i].latitude, color=c)
+		plt.scatter(data[i].longitude, data[i].latitude, color=c, zorder=1)
+
+	# show background image of Alaska map
+	img = imread("map_adjusted.jpg")
+	plt.imshow(img,zorder=0, extent=[-175.5,-157.5,49.5,66.0])
 
 	plt.show()
 	plt.close()
@@ -181,7 +186,7 @@ create animation of observations of a certain species over the years
 input: set of observations of 1 species over all years
 output: animated plot of the species over the years
 """
-def animate(data, species):
+def animate_set(data):
 
 	# plt.ion()  # set plotting mode to interactive or whatever
 	plt.show()
@@ -192,13 +197,61 @@ def animate(data, species):
 	i = 1
 	for time in range(1984,2015):
 
-		time_subset = data_subset(data,species,time)
+		time_subset = data_subset(data,"none",time)
 
 		# plot current figure
 		fig = plt.figure(i)
 		plt.scatter([x.longitude for x in time_subset], [x.latitude for x in time_subset])
 		plt.axis([-175.5,-157.5,49.5,66.0]) # CHANGE AXIS BOUNDARIES TO LIMITS OF RYAN'S GIF
 		# plt.axis([min([x.longitude for x in data]) - 1, max([x.longitude for x in data]) + 1, min([x.latitude for x in data]) - 1, max([x.latitude for x in data]) + 1])
+
+		# draw and then clear current points
+		plt.draw()
+		plt.pause(0.00005)
+		plt.clf()
+
+	plt.close()
+
+
+"""
+animate clusters of data
+input: set of observations of 1 species over all times
+output: animation of clusters over time
+"""
+def animate_clusters(data):
+
+	plt.show()
+
+	for year in range(1984,2015):
+
+		# create subset of data from that year
+		subset = data_subset(data,"none",year)
+		print(year, "observations:",len(subset))
+
+		# create new figure
+		fig = plt.figure(1)
+
+		# only perform clustering if there's more than one point
+		if len(subset) > 1:
+			clustering = clusters(subset)
+			for i in range(len(subset)):
+				cluster = clustering[i]
+				if cluster % 4 == 0:
+					c = "red"
+				elif cluster % 4 == 1:
+					c = "blue"
+				elif cluster % 4 == 2:
+					c = "green"
+				elif cluster % 4 == 3:
+					c = "black"
+
+				# plot point in color corresponding to cluster id
+				plt.scatter(subset[i].longitude, subset[i].latitude, color=c, zorder=1)
+
+		plt.axis([-175.5,-157.5,49.5,66.0])
+		# show background image of Alaska map
+		img = imread("map_adjusted.jpg")
+		plt.imshow(img,zorder=0, extent=[-175.5,-157.5,49.5,66.0])
 
 		# draw and then clear current points
 		plt.draw()
@@ -233,11 +286,12 @@ print(len(dist_matrix(subset)))
 
 # print clustering alongside corresponding points
 for i in range(len(subset)):
-	print("cluster", cluster_set[i][0], "(", subset[i].longitude, ",", subset[i].latitude, ")")
-
-clusterset_array = []
-for x in cluster_set:
-	clusterset_array.append(x[0])
+	print("cluster", cluster_set[i], "(", subset[i].longitude, ",", subset[i].latitude, ")")
 
 # plot the subset
-plot_clusters(subset)
+# plot_clusters(subset)
+
+species_set = data_subset(data,"Aforia circinata","none")
+print(len(species_set))
+
+animate_clusters(species_set)
