@@ -11,9 +11,9 @@ clustered_species = ['Aforia circinata','Argis dentata', 'Argis lar', 'Artediell
 # Read data into observation objects, make species subset, make cluster objects
 data = read_data("ebs_data.csv")
 subset = data_subset(data,my_species,"none")
-cluster_objects = make_clusters(subset)
-### animate_clusters(species_set)  # animate clusters over the years
 
+
+"""
 # Print cluster mapping for each year
 for year in range(1984,2014):
 	print("YEAR:",year,"\n------------")
@@ -26,4 +26,9 @@ for year in range(1984,2014):
 			x.cprint()  # Print current cluster
 			cluster_dict[x].cprint()  # Print corresponding next cluster
 			print("-")
-		print("\n")
+		print(" ")
+"""
+
+animate_clusters(subset,0.5)  # animate clusters over the years
+
+build_tree(subset)

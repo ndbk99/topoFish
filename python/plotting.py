@@ -7,6 +7,14 @@ from clustering import *
 
 plot_borders = [-175.5,-157.5,49.5,66.0]
 
+def plot(points):
+	plt.scatter([p[0] for p in points], [p[1] for p in points])
+	plt.axis(plot_borders)
+	# Show background image of Alaska map
+	img = imread("map_adjusted.jpg")
+	plt.imshow(img,zorder=0, extent=plot_borders)
+	plt.show()
+
 """
 Plot one data set (all observations of one species at one time)
 Input: set of observations of 1 species at 1 time
@@ -15,7 +23,9 @@ Output: plot of data points
 def plot_set(data):
 	plt.scatter([x.longitude for x in data], [x.latitude for x in data])
 	plt.axis(plot_borders)
-	# plt.axis([min_long - 1, max_long + 1, min_lat - 1, max_lat + 1])
+	# Show background image of Alaska map
+	img = imread("map_adjusted.jpg")
+	plt.imshow(img,zorder=0, extent=plot_borders)
 	plt.show()
 
 """
@@ -26,7 +36,7 @@ Output: plot of data points colored by cluster
 def plot_clusters(data):
 
 	# Can't perform clustering on 0 or 1 points so exit function
-	if len(data) < 2:
+	if len(data) < 1:
 		plt.show()
 		return 0
 
@@ -97,7 +107,7 @@ Animate clusters of data
 Input: set of observations of 1 species over all times
 Output: animation of clusters over time
 """
-def animate_clusters(data):
+def animate_clusters(data,speed=0.001):
 
 	plt.show()
 
@@ -111,7 +121,7 @@ def animate_clusters(data):
 		fig = plt.figure(1)
 
 		# Only perform clustering if there's more than one point
-		if len(subset) > 1:
+		if len(subset) >= 1:
 			clustering = clusters(subset)
 			for i in range(len(subset)):
 				cluster = clustering[i]
@@ -134,7 +144,7 @@ def animate_clusters(data):
 
 		# Draw and then clear current points
 		plt.draw()
-		plt.pause(0.001)
+		plt.pause(speed)
 		plt.clf()
 
 	plt.close()

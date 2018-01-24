@@ -1,6 +1,7 @@
 from clustering import *
 from plotting import *
 import math
+from anytree import Node, RenderTree
 
 # Set species
 my_species = "Aforia circinata"
@@ -65,7 +66,7 @@ def make_clusters(data):
 					if year_clustering[j] == i:
 						obs.append(year_subset[j])
 				year_array.append(cluster(obs,my_species,i,year))  # Create new cluster if the current id is found
-				
+
 		cluster_dict[year] = year_array
 
 	return cluster_dict
@@ -74,7 +75,7 @@ def make_clusters(data):
 """
 Matches clusters from current year to clusters from next year
 Input: current year, set of observations of given species
-Output: array of indices that the nth current_year cluster maps to in next_year. so output[i] is the new-year cluster id that the ith current cluster maps to
+Output: dict that maps current clusters to new clusters; keys are current clusters, values are corresponding new clusters
 """
 def cluster_map(current_year,data):
 
@@ -110,13 +111,13 @@ def cluster_map(current_year,data):
 			distances.append(dist)
 		distance_arrays.append(distances)
 
-	# Figure out which new cluster each current cluster should map to
+	# Figure out which new cluster id each current cluster id should map to
 	mapped_ids = []
 	for i in range(len(distance_arrays)):
 		m = distance_arrays[i].index(min(distance_arrays[i]))
 		mapped_ids.append(m)
 
-	print(mapped_ids)
+	# print(mapped_ids)
 
 	# Create dictionary out of this; key is current-year-cluster obj, value is next-year-cluster obj that it maps to
 	cluster_dict = {}
@@ -126,9 +127,78 @@ def cluster_map(current_year,data):
 	return cluster_dict
 
 
-def build_tree():
-	return 0
-	# Figure out how to put cluster_map maps into tree form
+"""
+Builds "tree" of cluster relationships
+Input: list ofobservations of 1 species over multiple years
+Output: dictionary of cluster maps; keys are years, values are each year's output of cluster_map, so either a string or a dictionary
+"""
+def build_tree(data):
+
+	tree = {}
+	for year in range(1984,2014):
+		tree[year] = cluster_map(year,data)  # Append each cluster mapping list to the "tree"
+		if year > 1984:
+			if len(tree[year]) < len(tree[year-1]):
+				pass
+				# Figure out which cluster died out
+			if len(tree[year]) > len(tree[year-1]):
+				pass
+				# Figure out which cluster sprouted a new one -
+
+	# Print out tree clusters and values
+	for x in tree:
+		print("-")
+		if type(tree[x]) == str:
+			print(tree[x])
+		else:
+			for y in tree[x]:
+				y.cprint()
+				if type(tree[x][y]) == str:
+					print(tree[x][y])
+				else:
+					tree[x][y].cprint()
+
+	# NEED TO EDIT THIS -
+	"""
+	- start writing things within the for year ...: loop
+	- link arrays together
+	- replace strings with arrays of None objects
+	- [0 1 2 3 x 5] [0 1 x 3 4 x] [x x x x x] <- instead of "extinction"!
+	"""
+
+	return tree
 
 
-############### MAIN ############################################
+"""
+Prints and returns centroids of clusters right before and after total extinction / colonization
+Input: set of observations of 1 species over all years
+Output: arrays of entry and exit clusters
+BASIC EXIT/ENTRY - need to do this for clusters more specifically, not the set overall. Like when / where does each unique cluster enter / exit? This requires data structure!!!
+"""
+def entry_exit(data):
+
+	entries = []  # To hold clusters in years right after colonization
+	exits = []  # To hold clusters in years right before extinction
+	for year in range(1984,2014):
+		cmap = cluster_map(year,data)  # Create cluster map from this year to next
+		if cmap == "extinction":
+			exits.append(make_clusters(data)[year])  # Add clusters right before extinction
+		if cmap == "colonization":
+			entries.append(make_clusters(data)[year+1])  # Add clusters right after colonization
+
+	print("\nENTRY POINTS: ", end="")
+	for year in entries:
+		for cluster in year:
+			print(cluster.centroid, end=" ")
+
+	print("\n\nEXIT POINTS: ", end="")
+	for year in exits:
+		for cluster in year:
+			print(cluster.centroid, end=" ")
+	print("")
+
+	return entries, exits
+
+
+
+##################################################################################

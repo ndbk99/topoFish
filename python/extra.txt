@@ -1,0 +1,26 @@
+
+# Print clusters for each year
+clusts = make_clusters(subset)
+for year in clusts:
+	for clust in clusts[year]:
+		clust.cprint()
+	print("---------")
+
+
+# Print centroids of entry and exit clusters
+ee = entry_exit(subset)
+entries = ee[0]
+exits = ee[1]
+
+entry_points = []
+for year in entries:
+	for clust in year:
+		entry_points.append(clust.centroid)
+
+exit_points = []
+for year in exits:
+	for clust in year:
+		exit_points.append(clust.centroid)
+
+plot(entry_points)
+plot(exit_points)
