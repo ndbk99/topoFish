@@ -1,5 +1,5 @@
 import csv
-from scipy import cluster
+from scipy.cluster import *
 from math import radians, cos, sin, asin, sqrt
 
 
