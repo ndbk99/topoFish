@@ -1,7 +1,6 @@
 from clustering import *
 from plotting import *
 from cluster_tracking import *
-from scipy.cluster import *
 
 # list of species that exhibit clustering behavior
 clustered_species = ['Aforia circinata','Argis dentata', 'Argis lar', 'Artediellus pacificus', 'Buccinum polare', 'Ciliatocardium ciliatum', 'Crangon dalli', 'Cyanea capillata', 'Echinarachnius parma', 'Elegius gracilis', 'Eunoe depressa', 'Euspira pallida', 'Gersemia rubiformis', 'Glebocarcinus oregonensis', 'Grandicrepidula grandis', 'Halichondria panicea', 'Halocynthia aurantium', 'Hiatella arctica', 'Icelus spatula', 'Icelus spiniger', \
@@ -32,4 +31,4 @@ for year in range(1984,2014):
 
 animate_clusters(subset,0.5)  # animate clusters over the years
 
-build_tree_mergesplit(subset)  # print out the cluster tree (the one that assumes mergers and splits)
+build_tree(subset)

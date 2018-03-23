@@ -75,7 +75,7 @@ def make_clusters(data):
 """
 Matches clusters from current year to clusters from next year
 Input: current year, set of observations of given species
-Output: dict that maps current clusters to new clusters; keys are clusters in current year, values are corresponding clusters in next year
+Output: dict that maps current clusters to new clusters; keys are current clusters, values are corresponding new clusters
 """
 def cluster_map(current_year,data):
 
@@ -129,54 +129,21 @@ def cluster_map(current_year,data):
 
 """
 Builds "tree" of cluster relationships
-Input: list of observations of 1 species over multiple years
+Input: list ofobservations of 1 species over multiple years
 Output: dictionary of cluster maps; keys are years, values are each year's output of cluster_map, so either a string or a dictionary
-* THIS VERSION ASSUMES MERGERS / SPLITS, NOT APPEARANCES / DISAPPEARANCES
 """
-def build_tree_mergesplit(data):
+def build_tree(data):
 
 	tree = {}
 	for year in range(1984,2014):
-		tree[year] = cluster_map(year,data)  # Append each year's cluster_map list to the "tree"
-
-	# Print out tree clusters and values
-	for x in tree:
-		print("-")
-		if type(tree[x]) == str:
-			print(tree[x])
-		else:
-			for y in tree[x]:
-				y.cprint()
-				if type(tree[x][y]) == str:
-					print(tree[x][y])
-				else:
-					tree[x][y].cprint()
-
-	return tree
-
-
-# Come up with better name
-# * THIS VERSION ASSUMES DISAPPEARANCES / APPEARANCES, NOT MERGERS / SPLITS
-#######
-# THIS NEEDS LOADS OF WORK AND SHIT BUT BASIC CONCEPT IS GOOD
-# should I be comparing year to year+1, not
-#######
-def build_tree_disapp(data):
-
-	tree = {}
-	for year in range(1984,2014):
-		tree[year] = cluster_map(year,data)  # Append each year's cluster_map list to the "tree"
+		tree[year] = cluster_map(year,data)  # Append each cluster mapping list to the "tree"
 		if year > 1984:
-			for key1 in tree[year]:
-				for key2 in tree[year]:
-					if key1.index == key2.index:  # APPEARANCE
-						# See which single current cluster is mapped to two different next-year ones
-						print("APPEARANCE")
-					if tree[year][key1].index == tree[year][key2].index:  # DISAPPEARANCE
-						# See which different current clusters are mapped to the same next-year one
-						print("DISAPPEARANCE")
-
-					# TEST THIS SHIT ABOVEs
+			if len(tree[year]) < len(tree[year-1]):
+				pass
+				# Figure out which cluster died out
+			if len(tree[year]) > len(tree[year-1]):
+				pass
+				# Figure out which cluster sprouted a new one -
 
 	# Print out tree clusters and values
 	for x in tree:
@@ -190,6 +157,14 @@ def build_tree_disapp(data):
 					print(tree[x][y])
 				else:
 					tree[x][y].cprint()
+
+	# NEED TO EDIT THIS -
+	"""
+	- start writing things within the for year ...: loop
+	- link arrays together
+	- replace strings with arrays of None objects
+	- [0 1 2 3 x 5] [0 1 x 3 4 x] [x x x x x] <- instead of "extinction"!
+	"""
 
 	return tree
 
